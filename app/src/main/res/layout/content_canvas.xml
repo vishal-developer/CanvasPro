@@ -1,0 +1,53 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary">
+    <!-- TODO: Update blank fragment layout -->
+    <com.noon.canvaspro.customview.MCanvasView
+        android:id="@+id/draw_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/btn_undo"
+        android:layout_margin="5dp"
+        android:background="@android:color/white" />
+
+    <Button
+        android:id="@+id/btn_undo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="3dp"
+        android:background="@color/colorAccent"
+        android:text="@string/btn_drw_undo" />
+
+    <Button
+        android:id="@+id/btn_redo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="3dp"
+        android:layout_toRightOf="@+id/btn_undo"
+        android:background="@color/colorAccent"
+        android:text="@string/btn_drw_redo" />
+
+    <Button
+        android:id="@+id/btn_color"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="3dp"
+        android:layout_toRightOf="@+id/btn_redo"
+        android:background="@color/colorAccent"
+        android:text="@string/btn_drw_chng_color" />
+
+    <Button
+        android:id="@+id/btn_import"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="3dp"
+        android:layout_toRightOf="@+id/btn_color"
+        android:background="@color/colorAccent"
+        android:text="@string/btn_drw_import" />
+
+</RelativeLayout>
