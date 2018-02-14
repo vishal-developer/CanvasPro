@@ -29,19 +29,23 @@ public class MCanvasView extends View implements View.OnTouchListener {
 
     public static final String TAG = MCanvasView.class.getSimpleName();
 
-    private Canvas  mCanvas;
-    private Path    mPath;
-    private Paint       mPaint;
+    private Canvas mCanvas;
+    private Path mPath;
+    private Paint mPaint;
     private List<Path> paths = new ArrayList<>();
     private List<Path> undonePaths = new ArrayList<>();
+    private List<Paint> paints = new ArrayList<>();
     private int defaultColor = Color.BLACK;
+    private float defaultStroke = 5.0F;
     private Bitmap mBitmap;
     private Matrix mMatrix;
     private RectF mSrcRectF;
     private RectF mDestRectF;
-    private String mText;
+    private String mText = "";
 
-
+    private float mX, mY;
+    private static final float TOUCH_TOLERANCE = 4;
+    private float textX, textY;
 
 
     public MCanvasView(Context context)   {
@@ -60,15 +64,10 @@ public class MCanvasView extends View implements View.OnTouchListener {
         setFocusableInTouchMode(true);
         this.setOnTouchListener(this);
 
-        mPaint = new Paint();
-        mPaint.setAntiAlias(true);
-        mPaint.setDither(true);
-        mPaint.setColor(defaultColor);
+        textX = (float)(getWidth()/2.5);
+        textY = (float)(getHeight()/2.5);
 
-        mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setStrokeJoin(Paint.Join.ROUND);
-        mPaint.setStrokeCap(Paint.Cap.ROUND);
-        mPaint.setStrokeWidth(5);
+        createPaint();
 
         mMatrix = new Matrix();
         mSrcRectF = new RectF();
@@ -94,18 +93,32 @@ public class MCanvasView extends View implements View.OnTouchListener {
 
 
 
+    public void drawText(String text, float mX, float mY){
+        mText = text;
+        textX = mX;
+        textY = mY;
+        invalidate();
+    }
+
     public void drawText(String text){
         mText = text;
+        invalidate();
 
+        /*Log.d(TAG, "mText :"+mText+" textX:"+textX+" textY:"+textY);
+        if(mText != null && mText.length()>0){
+            mCanvas.drawText(mText, 300, 300, mPaint);
+        }*/
     }
 
     public void setColor(int color){
         invalidate();
-        mPaint.setColor(color);
+        defaultColor = color;
     }
+
     public void setPaintWidth(float widthPx) {
             invalidate();
-            mPaint.setStrokeWidth(widthPx);
+            defaultStroke = widthPx;
+            mPaint.setStrokeWidth(defaultStroke);
     }
 
     @Override
@@ -115,13 +128,11 @@ public class MCanvasView extends View implements View.OnTouchListener {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        for (Path p : paths){
-            canvas.drawPath(p, mPaint);
+        mPaint.setColor(defaultColor);
+        for(int i = 0; i<paths.size(); i++){
+            canvas.drawPath(paths.get(i), paints.get(i));
         }
-        canvas.drawPath(mPath, mPaint);
-
         if(mBitmap!=null){
-
             // Setting size of Source Rect
             mSrcRectF.set(0, 0,(float) (mBitmap.getWidth()*2.5),(float) (mBitmap.getHeight()*2.5));
 
@@ -134,15 +145,13 @@ public class MCanvasView extends View implements View.OnTouchListener {
             // Drawing the bitmap in the canvas
             canvas.drawBitmap(mBitmap, mMatrix, mPaint);
         }
-        if(null != mText){
-            canvas.drawText(mText, 0, 0, mPaint);
+        Log.d(TAG, "mText :"+mText+" textX:"+textX+" textY:"+textY);
+        if(mText != null && mText.length()>0){
+            canvas.drawText(mText, textX, textY, mPaint);
         }
-
+        canvas.drawPath(mPath, mPaint);
     }
 
-
-    private float mX, mY;
-    private static final float TOUCH_TOLERANCE = 4;
 
     private void touch_start(float x, float y) {
         mPath.reset();
@@ -167,15 +176,33 @@ public class MCanvasView extends View implements View.OnTouchListener {
         mCanvas.drawPath(mPath, mPaint);
         // kill this so we don't double draw
         paths.add(mPath);
+
+        paints.add(mPaint);
+        createPaint();
+
         mPath = new Path();
+    }
+
+
+    private void createPaint(){
+        mPaint = new Paint();
+        mPaint.setAntiAlias(true);
+        mPaint.setDither(true);
+        mPaint.setColor(defaultColor);
+
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeJoin(Paint.Join.ROUND);
+        mPaint.setStrokeCap(Paint.Cap.ROUND);
+        mPaint.setStrokeWidth(defaultStroke);
+
+        mPaint.setTextAlign(Paint.Align.CENTER);
+        mPaint.setTextSize(24);
     }
 
     public void doUndo () {
         if (paths.size()>0)  {
             undonePaths.add(paths.remove(paths.size()-1));
             invalidate();
-        } else  {
-            Log.i("undo", "Undo elsecondition");
         }
     }
 
@@ -184,9 +211,7 @@ public class MCanvasView extends View implements View.OnTouchListener {
             paths.add(undonePaths.remove(undonePaths.size()-1));
             invalidate();
         }
-        else  {
-            Log.i("undo", "Redo elsecondition");
-        }
+
     }
 
     public boolean onTouch(View arg0, MotionEvent event) {

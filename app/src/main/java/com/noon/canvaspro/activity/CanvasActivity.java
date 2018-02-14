@@ -10,12 +10,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.noon.canvaspro.R;
@@ -29,7 +31,8 @@ public class CanvasActivity extends AppCompatActivity {
     public static int GALLERY_REQ_CODE = 1;
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {/*Manifest.permission.WRITE_EXTERNAL_STORAGE,*/Manifest.permission.READ_EXTERNAL_STORAGE};
-
+    int[] colors = {Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW};
+    int colorCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +46,10 @@ public class CanvasActivity extends AppCompatActivity {
 
     private void init(){
         mCanvasView = (MCanvasView)findViewById(R.id.draw_view);
+
+
+
+
         Button btnUndo, btnRedo, btnColors, btnSave;
         btnUndo = (Button)findViewById(R.id.btn_undo);
         btnUndo.setOnClickListener(clickListener);
@@ -53,9 +60,29 @@ public class CanvasActivity extends AppCompatActivity {
         btnColors = (Button)findViewById(R.id.btn_color);
         btnColors.setOnClickListener(clickListener);
 
-        btnSave = (Button)findViewById(R.id.btn_import);
+        btnSave = (Button)findViewById(R.id.btn_text);
         btnSave.setOnClickListener(clickListener);
-        mCanvasView.setPaintWidth(10);
+
+        SeekBar seekBar = (SeekBar)findViewById(R.id.stroke_seek_bar);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                mCanvasView.setPaintWidth(i);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        FloatingActionButton floatingGallary = (FloatingActionButton)findViewById(R.id.floating_gallary);
+        floatingGallary.setOnClickListener(clickListener);
     }
 
     View.OnClickListener clickListener = new View.OnClickListener() {
@@ -69,16 +96,20 @@ public class CanvasActivity extends AppCompatActivity {
                     mCanvasView.doRedo();
                     break;
                 case R.id.btn_color:
-                    mCanvasView.drawText("Yes");
                     mCanvasView.setColor(Color.RED);
                     break;
-                case R.id.btn_import:
+                case R.id.btn_text:
+                    mCanvasView.drawText("WelCome to Canvas Text", 300, 300);
+                    break;
+                case R.id.floating_gallary:
                     onGalleryBtnClick();
                     break;
             }
 
         }
     };
+
+
 
     public void onGalleryBtnClick() {
         Intent intent = new Intent(Intent.ACTION_PICK,

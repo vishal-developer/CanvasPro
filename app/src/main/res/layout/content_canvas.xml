@@ -1,8 +1,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingTop="?actionBarSize"
     android:background="@color/colorPrimary">
     <!-- TODO: Update blank fragment layout -->
+
     <com.noon.canvaspro.customview.MCanvasView
         android:id="@+id/draw_view"
         android:layout_width="match_parent"
@@ -10,6 +12,13 @@
         android:layout_above="@+id/btn_undo"
         android:layout_margin="5dp"
         android:background="@android:color/white" />
+    <SeekBar
+        android:layout_margin="15dp"
+        android:id="@+id/stroke_seek_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:max="24"
+        android:progress="2" />
 
     <Button
         android:id="@+id/btn_undo"
@@ -41,13 +50,13 @@
         android:text="@string/btn_drw_chng_color" />
 
     <Button
-        android:id="@+id/btn_import"
+        android:id="@+id/btn_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_margin="3dp"
         android:layout_toRightOf="@+id/btn_color"
         android:background="@color/colorAccent"
-        android:text="@string/btn_drw_import" />
+        android:text="@string/btn_drw_text" />
 
 </RelativeLayout>
