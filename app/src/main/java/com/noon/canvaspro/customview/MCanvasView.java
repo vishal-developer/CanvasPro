@@ -10,6 +10,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.RectF;
+import android.support.annotation.FloatRange;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -26,19 +27,20 @@ import java.util.List;
 
 public class MCanvasView extends View implements View.OnTouchListener {
 
+    public static final String TAG = MCanvasView.class.getSimpleName();
+
     private Canvas  mCanvas;
     private Path    mPath;
     private Paint       mPaint;
     private List<Path> paths = new ArrayList<>();
     private List<Path> undonePaths = new ArrayList<>();
     private int defaultColor = Color.BLACK;
-    private Bitmap bitmap;
+    private Bitmap mBitmap;
     private Matrix mMatrix;
     private RectF mSrcRectF;
     private RectF mDestRectF;
     private String mText;
 
-//    List<Pair<Path, Integer>> path_color_list = new ArrayList<>();
 
 
 
@@ -62,12 +64,11 @@ public class MCanvasView extends View implements View.OnTouchListener {
         mPaint.setAntiAlias(true);
         mPaint.setDither(true);
         mPaint.setColor(defaultColor);
+
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStrokeWidth(5);
-
-
 
         mMatrix = new Matrix();
         mSrcRectF = new RectF();
@@ -75,18 +76,23 @@ public class MCanvasView extends View implements View.OnTouchListener {
 
         mCanvas = new Canvas();
         mPath = new Path();
-        paths.add(mPath);
     }
 
     public void addBitmap(Bitmap bitmap){
-
-
-        this.bitmap = bitmap;
+        mBitmap = bitmap;
     }
+
+
 
     public Bitmap getBitmap(){
-        return bitmap;
+        this.setDrawingCacheEnabled(true);
+        this.buildDrawingCache();
+        Bitmap bmp = Bitmap.createBitmap(this.getDrawingCache());
+        this.setDrawingCacheEnabled(false);
+        return bmp;
     }
+
+
 
     public void drawText(String text){
         mText = text;
@@ -97,6 +103,11 @@ public class MCanvasView extends View implements View.OnTouchListener {
         invalidate();
         mPaint.setColor(color);
     }
+    public void setPaintWidth(float widthPx) {
+            invalidate();
+            mPaint.setStrokeWidth(widthPx);
+    }
+
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
@@ -104,16 +115,15 @@ public class MCanvasView extends View implements View.OnTouchListener {
 
     @Override
     protected void onDraw(Canvas canvas) {
-
         for (Path p : paths){
             canvas.drawPath(p, mPaint);
         }
         canvas.drawPath(mPath, mPaint);
 
-        if(bitmap!=null){
+        if(mBitmap!=null){
 
             // Setting size of Source Rect
-            mSrcRectF.set(0, 0,(float) (bitmap.getWidth()*2.5),(float) (bitmap.getHeight()*2.5));
+            mSrcRectF.set(0, 0,(float) (mBitmap.getWidth()*2.5),(float) (mBitmap.getHeight()*2.5));
 
             // Setting size of Destination Rect
             mDestRectF.set(0, 0, getWidth(), getHeight());
@@ -122,14 +132,12 @@ public class MCanvasView extends View implements View.OnTouchListener {
             mMatrix.setRectToRect( mSrcRectF , mDestRectF, Matrix.ScaleToFit.START);
 
             // Drawing the bitmap in the canvas
-            canvas.drawBitmap(bitmap, mMatrix, mPaint);
+            canvas.drawBitmap(mBitmap, mMatrix, mPaint);
         }
         if(null != mText){
             canvas.drawText(mText, 0, 0, mPaint);
         }
 
-        // Redraw the canvas
-        invalidate();
     }
 
 

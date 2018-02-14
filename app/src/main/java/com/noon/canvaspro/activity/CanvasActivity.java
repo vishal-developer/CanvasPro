@@ -55,6 +55,7 @@ public class CanvasActivity extends AppCompatActivity {
 
         btnSave = (Button)findViewById(R.id.btn_import);
         btnSave.setOnClickListener(clickListener);
+        mCanvasView.setPaintWidth(10);
     }
 
     View.OnClickListener clickListener = new View.OnClickListener() {
